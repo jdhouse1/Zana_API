@@ -31,7 +31,15 @@ def home():
 
 @app.route('/v1/packing_slip/', methods=['POST'])
 def packing_slip():
+    necessary_keys = {'order_number',
+                      'items',
+                      'date',
+                      'shipping_address',
+                      'message',
+                      }
     context = request.json
+    if not necessary_keys <= context.keys():
+        return f"Error - didn't receive correct arguments. The following arguments are required: {necessary_keys}"
     name = path / f"Order_{context['order_number']}.pdf"
     temp = path / 'temp.docx'
     doc = docxtpl.DocxTemplate(path / 'packing_slip.docx')
