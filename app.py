@@ -1,7 +1,6 @@
-import docx2pdf
 import docxtpl
 import flask
-import pythoncom
+import convertapi
 import yagmail
 from flask import request
 from pathlib import Path
@@ -12,6 +11,7 @@ x = ''
 my_email = 'Zana.Packing.API@gmail.com'
 recipient_email = my_email
 path = Path()
+convertapi.api_secret = os.environ['CONVERTAPI_SECRET']
 
 
 def send_email(order_number, body, attachments):
@@ -47,8 +47,8 @@ def packing_slip():
     doc = docxtpl.DocxTemplate(path / 'packing_slip.docx')
     doc.render(context)
     doc.save(temp)
-    pythoncom.CoInitialize()
-    docx2pdf.convert(temp, name)
+    pdf = convertapi.convert('pdf', {'File': temp}, from_format='docx')
+    pdf.save_files(name)
     body = ""
     send_email(context['order_number'], body, name)
     os.remove(name)
@@ -59,3 +59,8 @@ def packing_slip():
 def register_account():
     registration = request.json
     yagmail.register(*registration)
+    return "Success!"
+
+
+if __name__ == '__main__':
+    app.run()
