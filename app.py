@@ -55,4 +55,7 @@ def packing_slip():
     return "Success!"
 
 
-app.run()
+@app.route('/register/', methods=['POST'])
+def register_account():
+    registration = request.json
+    yagmail.register(*registration)
