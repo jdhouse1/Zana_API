@@ -59,4 +59,4 @@ jobs:
         with:
           app-name: 'ZanaPackingSlips'
           slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_5142ce52c90847828d58dfa7f7a9ac8c }}
+          publish-profile: ${{ secrets.AzureAppService_PublishProfile_60ff5f843faa46f8a6dd55a2a94d6035 }}
