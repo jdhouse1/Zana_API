@@ -60,5 +60,5 @@ def register_account():
     return "Success!"
 
 
-if __name__ == '__main__':
-    app.run()
+# if __name__ == '__main__':
+#     app.run()
