@@ -2,3 +2,4 @@ docxtpl~=0.11.3
 Flask~=1.1.2
 yagmail~=0.14.247
 convertapi~=1.4.0
+keyring
