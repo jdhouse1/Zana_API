@@ -7,7 +7,6 @@ from pathlib import Path
 import os
 
 app = flask.Flask(__name__)
-x = ''
 my_email = 'Zana.Packing.API@gmail.com'
 recipient_email = my_email
 path = Path()
@@ -30,15 +29,6 @@ def home():
     return "Hello! - JD House"
 
 
-@app.route('/test/', methods=['POST'])
-def test():
-    print(request.form)
-    print(dict(request.form))
-    global x
-    x += request.form['data']
-    return "Success"
-
-
 @app.route('/v1/packing_slip/', methods=['POST'])
 def packing_slip():
     context = request.json
@@ -58,7 +48,7 @@ def packing_slip():
 @app.route('/register/', methods=['POST'])
 def register_account():
     registration = request.json
-    yagmail.register(*registration)
+    yagmail.register(**registration)
     return "Success!"
 
 
