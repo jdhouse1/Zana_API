@@ -3,14 +3,21 @@ import flask
 import convertapi
 import yagmail
 from flask import request
+from flask_httpauth import HTTPBasicAuth
+from passlib.context import CryptContext
 from pathlib import Path
+from dotenv import load_dotenv
 import os
 
+load_dotenv()
 app = flask.Flask(__name__)
+auth = HTTPBasicAuth()
+pwd_context = CryptContext(schemes=['sha512_crypt'])
 my_email = 'Zana.Packing.API@gmail.com'
 recipient_email = my_email
 path = Path()
 convertapi.api_secret = os.environ['CONVERTAPI_SECRET']
+password_hash = os.environ['AUTH_HASH']
 
 
 def send_email(order_number, body, attachments):
@@ -24,12 +31,19 @@ def send_email(order_number, body, attachments):
     )
 
 
+@auth.verify_password
+def verify_password(username, password):
+    if pwd_context.verify(password, password_hash):
+        return username
+
+
 @app.route('/', methods=['GET'])
 def home():
     return "Hello! - JD House"
 
 
 @app.route('/v1/packing_slip/', methods=['POST'])
+@auth.login_required
 def packing_slip():
     necessary_keys = {'order_number',
                       'items',
@@ -54,6 +68,7 @@ def packing_slip():
 
 
 @app.route('/register/', methods=['POST'])
+@auth.login_required
 def register_account():
     registration = request.json
     yagmail.register(**registration)
