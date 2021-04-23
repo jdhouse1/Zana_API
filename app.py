@@ -34,6 +34,16 @@ def send_email(order_number, body, attachments):
     )
 
 
+def create_slip(context):
+    name = path / f"Order_{context['order_number']}.pdf"
+    temp = path / 'temp.docx'
+    doc = docxtpl.DocxTemplate(path / 'packing_slip.docx')
+    doc.render(context)
+    doc.save(temp)
+    pdf = convertapi.convert('pdf', {'File': temp}, from_format='docx')
+    pdf.save_files(name)
+    return name
+
 @auth.verify_password
 def verify_password(username, password):
     if pwd_context.verify(password, password_hash):
@@ -57,13 +67,7 @@ def packing_slip():
     context = request.json
     if not necessary_keys <= context.keys():
         return f"Error - didn't receive correct arguments. The following arguments are required: {necessary_keys}"
-    name = path / f"Order_{context['order_number']}.pdf"
-    temp = path / 'temp.docx'
-    doc = docxtpl.DocxTemplate(path / 'packing_slip.docx')
-    doc.render(context)
-    doc.save(temp)
-    pdf = convertapi.convert('pdf', {'File': temp}, from_format='docx')
-    pdf.save_files(name)
+    name = create_slip(context)
     body = ""
     send_email(context['order_number'], body, name)
     os.remove(name)
