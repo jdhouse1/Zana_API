@@ -8,6 +8,7 @@ from passlib.context import CryptContext
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from random import randrange
 
 load_dotenv()
 app = flask.Flask(__name__)
@@ -18,6 +19,8 @@ recipient_email = my_email
 path = Path()
 convertapi.api_secret = os.environ['CONVERTAPI_SECRET']
 password_hash = os.environ['AUTH_HASH']
+image_folder = Path("images")
+ALLOWED_FILETYPES = {'txt', 'jpg', 'jpeg', 'png', 'gif', 'svg'}
 
 
 def send_email(order_number, body, attachments):
@@ -65,6 +68,18 @@ def packing_slip():
     send_email(context['order_number'], body, name)
     os.remove(name)
     return "Success!"
+
+
+@app.route('/images/', methods=['POST'])
+@auth.login_required
+def upload_image():
+    file = request.files['client_image']
+    filetype = file.filename.split('.')[-1]
+    if filetype not in ALLOWED_FILETYPES:
+        return "File not accepted. Acceptable filetypes are " + ALLOWED_FILETYPES
+    file_id = hex(randrange(2 ** 64))
+    file.save(image_folder / f'{str(file_id)}.{filetype}')
+    return file_id
 
 
 @app.route('/register/', methods=['POST'])
