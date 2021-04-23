@@ -44,6 +44,7 @@ def create_slip(context):
     pdf.save_files(name)
     return name
 
+
 @auth.verify_password
 def verify_password(username, password):
     if pwd_context.verify(password, password_hash):
@@ -63,13 +64,15 @@ def packing_slip():
                       'date',
                       'shipping_address',
                       'message',
+                      'image',
                       }
     context = request.json
     if not necessary_keys <= context.keys():
         return f"Error - didn't receive correct arguments. The following arguments are required: {necessary_keys}"
     name = create_slip(context)
+    image = image_folder / context['image']
     body = ""
-    send_email(context['order_number'], body, name)
+    send_email(context['order_number'], body, [name, image])
     os.remove(name)
     return "Success!"
 
